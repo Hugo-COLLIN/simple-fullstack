@@ -1,11 +1,14 @@
 {
   "name": "simple-fullstack",
-  "module": "index.ts",
+  "module": "server.ts",
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "pug": "^3.0.3"
   }
 }
