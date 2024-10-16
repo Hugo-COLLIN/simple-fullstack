@@ -55,7 +55,7 @@ function main() {
   serve({
     fetch(req: Request) {
       const url = new URL(req.url);
-      const routeHandler = routes[url.pathname] || routes["/"];  // Default route is "/"
+      const routeHandler = routes[url.pathname];
       return routeHandler ? routeHandler(req) : new Response("Not Found", { status: 404 });
     },
     port: 3000,
