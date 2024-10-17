@@ -9,7 +9,7 @@ function main() {
   initDatabase(); // Initialize the SQLite database
 
   // Browse all files in the "views" folder
-  const routes: Record<string, (req: Request) => Promise<Response> | Response> = {};
+  const routes: Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response> = {};
   const pages = new Glob(PAGES_PROJECT_PATH + "*.pug");
 
   for (const file of pages.scanSync(".")) {
@@ -17,6 +17,7 @@ function main() {
     routes[routePath] = handlePugRendering(file);
   }
 
+  // Create task route
   routes["/todos"] = async function(req: Request) {
     if (req.method === "POST") {
       const formData = await req.formData();
@@ -31,11 +32,16 @@ function main() {
     return new Response("Method not allowed", { status: 405 });
   };
 
-  routes["/todos/:id"] = async function(req: Request) {
-    const url = new URL(req.url);
-    const id = parseInt(url.pathname.split("/").pop() || "0", 10);
+  // Handle dynamic route for /todos/:id
+  routes["/todos/:id"] = async function(req: Request, params?: Record<string, string>) {
+    if (!params || !params.id) {
+      return new Response("Invalid ID", { status: 400 });
+    }
+
+    const id = parseInt(params.id, 10);
 
     if (req.method === "DELETE") {
+      console.log(`Deleting task with id: ${id}`);
       await deleteToDo(id);
       return new Response(null, { status: 200 });
     }
@@ -43,6 +49,7 @@ function main() {
     return new Response("Method not allowed", { status: 405 });
   };
 
+  // Main page route
   routes["/"] = async function() {
     const todos = await readToDoList();
     const html = renderFile(PAGES_PROJECT_PATH + "index.pug", { todos });
@@ -55,13 +62,45 @@ function main() {
   serve({
     fetch(req: Request) {
       const url = new URL(req.url);
-      const routeHandler = routes[url.pathname];
-      return routeHandler ? routeHandler(req) : new Response("Not Found", { status: 404 });
+      const routeResult = matchRoute(url.pathname, routes);
+
+      if (routeResult) {
+        const { handler, params } = routeResult;
+        return handler(req, params);
+      }
+
+      return new Response("Not Found", { status: 404 });
     },
-    port: 3000,
+    port: 3001,
   });
 
   console.log("Server started on http://localhost:3000");
+}
+
+/**
+ * Match the URL path with the defined routes, including dynamic segments.
+ * @param path The URL path
+ * @param routes The route handlers
+ * @returns The matched route handler and extracted params
+ */
+function matchRoute(path: string, routes: Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response>) {
+  for (const route in routes) {
+    const routePattern = route.replace(/:([^/]+)/g, "([^/]+)"); // Replace ":param" with a regex group
+    const regex = new RegExp(`^${routePattern}$`);
+    const match = path.match(regex);
+
+    if (match) {
+      const paramNames = (route.match(/:([^/]+)/g) || []).map(name => name.slice(1)); // Extract param names (e.g. "id")
+      const params: Record<string, string> = {};
+      paramNames.forEach((paramName, index) => {
+        params[paramName] = match[index + 1]; // Map param values
+      });
+
+      return { handler: routes[route], params };
+    }
+  }
+
+  return null; // No match found
 }
 
 /**
