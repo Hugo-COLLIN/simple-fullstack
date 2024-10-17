@@ -1,9 +1,9 @@
 {
   "name": "simple-fullstack",
-  "module": "src/server.ts",
+  "module": "src/server/server.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun src/server.ts"
+    "dev": "bun src/server/server.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
