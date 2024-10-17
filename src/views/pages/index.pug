@@ -9,11 +9,11 @@ html
       each todo in todos
         li
           | #{todo.title} - #{todo.status}
-          button(hx-delete=`/todos/${todo.id}` hx-target="closest li" hx-swap="outerHTML") Delete
+          button(hx-delete=`/api/todos/${todo.id}` hx-target="closest li" hx-swap="outerHTML") Delete
       else
         li No tasks found
 
-    form(hx-post="/todos" hx-target="#tasks" hx-swap="beforeend")
+    form(hx-post="/api/todos" hx-target="#tasks" hx-swap="beforeend")
       input(name="title" placeholder="Task title")
       input(name="status" placeholder="Task status")
       button Save
