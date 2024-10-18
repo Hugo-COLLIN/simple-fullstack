@@ -1,5 +1,5 @@
 import {renderFile} from "pug";
-import {PAGES_PROJECT_PATH} from "../server.ts";
+import {PAGES_PROJECT_PATH} from "../server";
 
 /**
  * Match the URL path with the defined routes, including dynamic segments.
