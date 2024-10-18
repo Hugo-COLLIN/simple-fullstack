@@ -57,6 +57,17 @@ function main() {
     }
   }
 
+  routes["/"] = async function() {
+    const response = await handleEntityRequest(null, "readAll", "todos");
+
+    if (response.ok) {
+      const todos = await response.json();
+      return handlePugRendering(PAGES_PROJECT_PATH + "index.pug", { todos })();
+    } else {
+      return new Response("Failed to load todos", { status: 500 });
+    }
+  };
+
   console.info(routes);
 
   // Serve the routes

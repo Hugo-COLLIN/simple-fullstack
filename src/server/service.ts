@@ -22,20 +22,23 @@ export function initDatabaseFromConfig(config: any) {
 /**
  * Handle a dynamic entity request (create, read, update, delete)
  */
-export async function handleEntityRequest(req: Request, action: string, entity: string, id?: string) {
-  const table = entity; // Entity maps to the table name
+export async function handleEntityRequest(req: Request | null, action: string, entity: string, id?: string) {
+  const table = entity;
 
   switch (action) {
     case "create":
-      const formData = await req.formData();
-      const values = Object.fromEntries(formData.entries());
+      if (req) {
+        const formData = await req.formData();
+        const values = Object.fromEntries(formData.entries());
 
-      const columns = Object.keys(values).join(", ");
-      const placeholders = Object.keys(values).map(() => "?").join(", ");
-      const stmt = db.prepare(`INSERT INTO ${table} (${columns}) VALUES (${placeholders})`);
-      stmt.run(...Object.values(values));
+        const columns = Object.keys(values).join(", ");
+        const placeholders = Object.keys(values).map(() => "?").join(", ");
+        const stmt = db.prepare(`INSERT INTO ${table} (${columns}) VALUES (${placeholders})`);
+        stmt.run(...Object.values(values));
 
-      return new Response("Entity created", { status: 201 });
+        return new Response("Entity created", { status: 201 });
+      }
+      break;
 
     case "readAll":
       const rows = db.query(`SELECT * FROM ${table}`).all();
@@ -49,11 +52,14 @@ export async function handleEntityRequest(req: Request, action: string, entity: 
       return new Response("Entity not found", { status: 404 });
 
     case "update":
-      const updateData = await req.formData();
-      const updateFields = Object.keys(updateData).map((key) => `${key} = ?`).join(", ");
-      const updateStmt = db.prepare(`UPDATE ${table} SET ${updateFields} WHERE id = ?`);
-      updateStmt.run(...Object.values(updateData), id);
-      return new Response("Entity updated", { status: 200 });
+      if (req) {
+        const updateData = await req.formData();
+        const updateFields = Object.keys(updateData).map((key) => `${key} = ?`).join(", ");
+        const updateStmt = db.prepare(`UPDATE ${table} SET ${updateFields} WHERE id = ?`);
+        updateStmt.run(...Object.values(updateData), id);
+        return new Response("Entity updated", { status: 200 });
+      }
+      break;
 
     case "delete":
       const deleteStmt = db.prepare(`DELETE FROM ${table} WHERE id = ?`);
@@ -63,4 +69,7 @@ export async function handleEntityRequest(req: Request, action: string, entity: 
     default:
       return new Response("Action not supported", { status: 400 });
   }
+
+  return new Response("Bad Request", { status: 400 });
 }
+
