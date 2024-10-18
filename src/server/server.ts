@@ -5,8 +5,8 @@ import {determineRoute, handlePugRendering} from "./requests/pages.ts";
 import type {ApiConfig} from "./models/apiConfig.ts";
 import {matchRoute} from "./router.ts";
 
-const API_CONFIG_PATH = "./src/views/api/";
-export const PAGES_PROJECT_PATH = "./src/views/pages/";
+const API_CONFIG_PATH = "./src/views/endpoints/api/";
+export const PAGES_PROJECT_PATH = "./src/views/endpoints/pages/";
 
 async function main() {
   // Initialize the database from YAML configuration

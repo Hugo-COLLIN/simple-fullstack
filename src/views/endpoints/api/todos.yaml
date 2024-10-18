@@ -14,5 +14,5 @@ routes:
   create: true
   read: true
   readAll: true
-  update: true
+  update: false
   delete: true
