@@ -1,5 +1,5 @@
 import {renderFile} from "pug";
-import {PAGES_PROJECT_PATH} from "../server";
+import {PAGES_PROJECT_PATH} from "../server.ts";
 
 /**
  * Render pug files with optional data
