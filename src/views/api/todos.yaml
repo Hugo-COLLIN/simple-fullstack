@@ -1,0 +1,18 @@
+model:
+  table: todos
+  fields:
+    - name: id
+      type: INTEGER
+      primaryKey: true
+      autoincrement: true
+    - name: title
+      type: TEXT
+    - name: status
+      type: TEXT
+
+routes:
+  create: true
+  read: true
+  readAll: true
+  update: true
+  delete: true
