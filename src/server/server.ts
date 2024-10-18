@@ -4,15 +4,15 @@ import { load } from "js-yaml"; // Assume a YAML parser is installed
 import { initDatabaseFromConfig, handleEntityRequest } from "./service.ts";
 import {determineRoute, handlePugRendering, matchRoute} from "./routing/pages.ts";
 import type {ApiConfig} from "./types";
-import {renderFile} from "pug";
 
 const API_CONFIG_PATH = "./src/views/api/";
 export const PAGES_PROJECT_PATH = "./src/views/pages/";
 
 function main() {
   // Initialize the database from YAML configuration
-  const apiFiles = new Glob(API_CONFIG_PATH + "*.yaml").scanSync(".");
-  for (const file of apiFiles) {
+  const api = new Glob(API_CONFIG_PATH + "*.yaml");
+  console.log("API files found:", api.scanSync("."));
+  for (const file of api.scanSync(".")) {
     const fileContent = readFileSync(file, "utf-8");
     const config = load(fileContent);
     initDatabaseFromConfig(config); // Initialize tables from the config
@@ -28,11 +28,14 @@ function main() {
   }
 
   // Define API routes dynamically based on the YAML configuration
-  for (const file of apiFiles) {
+  for (const file of api.scanSync(".")) {
     const fileContent = readFileSync(file, "utf-8");
     const config = load(fileContent) as ApiConfig;
+    console.log("Loaded YAML file:", file, "with content:", config);
 
     const entity = config.model.table;
+
+    console.log("Entity found:", entity);
 
     // Dynamic API route handling based on the configuration
     if (config.routes.create) {
