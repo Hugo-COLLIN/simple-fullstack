@@ -45,8 +45,8 @@ async function main() {
         handleEntityRequest(req, "create", entity);
     }
     if (config.routes.readAll) {
-      if (!routes[`/api/${entity}/list`]) routes[`/api/${entity}/list`] = {};
-      routes[`/api/${entity}/list`]["GET"] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}`]) routes[`/api/${entity}`] = {};
+      routes[`/api/${entity}`]["GET"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "readAll", entity);
     }
     if (config.routes.read) {
