@@ -15,7 +15,7 @@ export function matchRoute(
 ) {
   for (const route in routes) {
     const routePattern = route.replace(/:([^/]+)/g, "([^/]+)"); // Replace ":param" with a regex group
-    const regex = new RegExp(`^${routePattern}$`);
+    const regex = new RegExp(`^${routePattern}(/)?$`);
     const match = path.match(regex);
 
     if (match && routes[route][method]) {
