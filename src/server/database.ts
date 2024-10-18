@@ -1,5 +1,4 @@
 import { Database } from "bun:sqlite";
-import { load } from "js-yaml";
 
 const db = new Database("dynamic_api.db");
 

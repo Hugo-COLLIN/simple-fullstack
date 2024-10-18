@@ -1,8 +1,9 @@
 import {Glob, serve} from "bun";
 import {load} from "js-yaml";
-import {initDatabaseFromConfig, handleEntityRequest} from "./service.ts";
-import {determineRoute, handlePugRendering, matchRoute} from "./routing/pages.ts";
-import type {ApiConfig} from "./types";
+import {initDatabaseFromConfig, handleEntityRequest} from "./database.ts";
+import {determineRoute, handlePugRendering} from "./routing/pages.ts";
+import type {ApiConfig} from "./routing/types.ts";
+import {matchRoute} from "./routing/router.ts";
 
 const API_CONFIG_PATH = "./src/views/api/";
 export const PAGES_PROJECT_PATH = "./src/views/pages/";
@@ -10,18 +11,44 @@ export const PAGES_PROJECT_PATH = "./src/views/pages/";
 async function main() {
   // Initialize the database from YAML configuration
   const api = new Glob(API_CONFIG_PATH + "*.yaml");
-  console.log("API files found:", api.scanSync("."));
+
+  await createDatabase(api);
+
+  const routes = await createRoutes(api);
+
+  // Serve the routes
+  const server = serve({
+    fetch(req: Request) {
+      const url = new URL(req.url);
+      const routeResult = matchRoute(req.method, url.pathname, routes);
+
+      if (routeResult) {
+        const {handler, params} = routeResult;
+        return handler(req, params);
+      }
+
+      return new Response("Not Found", {status: 404});
+    },
+    port: 3001,
+  });
+
+  console.log(`Server started on ${server.url}`);
+}
+
+async function createDatabase(api: Glob) {
   for (const file of api.scanSync(".")) {
     const fileContent = Bun.file(file);
     const config = load(await fileContent.text());
     console.log("Loaded YAML file:", file, "with content of:", config);
     initDatabaseFromConfig(config); // Initialize tables from the config
   }
+}
 
-  // Browse all files in the "views" folder
+async function createRoutes(api: Glob) {
   const routes: Record<string, Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response>> = {};
   const pages = new Glob(PAGES_PROJECT_PATH + "*.pug");
 
+  // Browse all files in the "views" folder
   for (const file of pages.scanSync(".")) {
     const routePath = determineRoute(file);
     if (!routes[routePath]) routes[routePath] = {};
@@ -79,23 +106,7 @@ async function main() {
 
   console.info(routes);
 
-  // Serve the routes
-  serve({
-    fetch(req: Request) {
-      const url = new URL(req.url);
-      const routeResult = matchRoute(req.method, url.pathname, routes);
-
-      if (routeResult) {
-        const {handler, params} = routeResult;
-        return handler(req, params);
-      }
-
-      return new Response("Not Found", {status: 404});
-    },
-    port: 3001,
-  });
-
-  console.log("Server started on http://localhost:3001");
+  return routes;
 }
 
 main();
