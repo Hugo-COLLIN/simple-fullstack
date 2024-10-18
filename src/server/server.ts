@@ -1,6 +1,6 @@
-import { Glob, serve } from "bun";
-import { load } from "js-yaml";
-import { initDatabaseFromConfig, handleEntityRequest } from "./service.ts";
+import {Glob, serve} from "bun";
+import {load} from "js-yaml";
+import {initDatabaseFromConfig, handleEntityRequest} from "./service.ts";
 import {determineRoute, handlePugRendering, matchRoute} from "./routing/pages.ts";
 import type {ApiConfig} from "./types";
 
@@ -19,12 +19,13 @@ async function main() {
   }
 
   // Browse all files in the "views" folder
-  const routes: Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response> = {};
+  const routes: Record<string, Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response>> = {};
   const pages = new Glob(PAGES_PROJECT_PATH + "*.pug");
 
   for (const file of pages.scanSync(".")) {
     const routePath = determineRoute(file);
-    routes[routePath] = handlePugRendering(file);
+    if (!routes[routePath]) routes[routePath] = {};
+    routes[routePath]["GET"] = handlePugRendering(file);
   }
 
   // Define API routes dynamically based on the YAML configuration
@@ -39,28 +40,33 @@ async function main() {
 
     // Dynamic API route handling based on the configuration
     if (config.routes.create) {
-      routes[`/api/${entity}`] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}`]) routes[`/api/${entity}`] = {};
+      routes[`/api/${entity}`]["POST"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "create", entity);
     }
     if (config.routes.readAll) {
-      routes[`/api/${entity}/list`] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}/list`]) routes[`/api/${entity}/list`] = {};
+      routes[`/api/${entity}/list`]["GET"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "readAll", entity);
     }
     if (config.routes.read) {
-      routes[`/api/${entity}/:id`] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}/:id`]) routes[`/api/${entity}/:id`] = {};
+      routes[`/api/${entity}/:id`]["GET"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "read", entity, params?.id);
     }
     if (config.routes.update) {
-      routes[`/api/${entity}/:id`] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}/:id`]) routes[`/api/${entity}/:id`] = {};
+      routes[`/api/${entity}/:id`]["PUT"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "update", entity, params?.id);
     }
     if (config.routes.delete) {
-      routes[`/api/${entity}/:id`] = (req: Request, params?: Record<string, string>) =>
+      if (!routes[`/api/${entity}/:id`]) routes[`/api/${entity}/:id`] = {};
+      routes[`/api/${entity}/:id`]["DELETE"] = (req: Request, params?: Record<string, string>) =>
         handleEntityRequest(req, "delete", entity, params?.id);
     }
   }
 
-  routes["/"] = async function () {
+  routes["/"]["GET"] = async function () {
     const response = await handleEntityRequest(null, "readAll", "todos");
 
     if (response.ok) {
@@ -77,7 +83,7 @@ async function main() {
   serve({
     fetch(req: Request) {
       const url = new URL(req.url);
-      const routeResult = matchRoute(url.pathname, routes);
+      const routeResult = matchRoute(req.method, url.pathname, routes);
 
       if (routeResult) {
         const {handler, params} = routeResult;
