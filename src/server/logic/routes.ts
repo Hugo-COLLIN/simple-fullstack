@@ -1,4 +1,4 @@
-import {ENDPOINTS_PROJECT_PATH} from "../server.ts";
+import {ENDPOINTS_PROJECT_PATH} from "../state/constants.ts";
 
 /**
  * Determine the route based on the file path

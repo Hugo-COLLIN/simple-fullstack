@@ -4,7 +4,8 @@ import {handleEntityRequest, initDatabaseFromConfig} from "../logic/database.ts"
 import {determineApiRoute, determineRoute} from "../logic/routes.ts";
 import {handlePugRendering} from "../logic/views.ts";
 import type {ApiConfig} from "../types/apiConfig.ts";
-import {ENDPOINTS_PROJECT_PATH} from "../server.ts";
+
+import {ENDPOINTS_PROJECT_PATH} from "../state/constants.ts";
 
 export async function init() {
   const api = new Glob(ENDPOINTS_PROJECT_PATH + "**/*.yaml"); // Support nested folders with "**/*.yaml"
