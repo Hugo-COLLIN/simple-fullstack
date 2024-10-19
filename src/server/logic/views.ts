@@ -1,4 +1,9 @@
 import {renderFile} from "pug";
+import {Glob} from "bun";
+
+export const ENDPOINTS_PROJECT_PATH = "./src/views/endpoints/";
+export const pages = new Glob(ENDPOINTS_PROJECT_PATH + "**/*.pug");
+export const api = new Glob(ENDPOINTS_PROJECT_PATH + "**/*.yaml");
 
 /**
  * Render pug files with optional data
@@ -11,4 +16,3 @@ export function handlePugRendering(file: string, data: Record<string, any> = {})
     return new Response(html, {headers: {"Content-Type": "text/html"}});
   };
 }
-

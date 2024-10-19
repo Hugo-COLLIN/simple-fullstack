@@ -1,21 +1,18 @@
-import {Glob} from "bun";
 import {load} from "js-yaml";
 import {handleEntityRequest, initDatabaseFromConfig} from "../logic/database.ts";
-import {ENDPOINTS_PROJECT_PATH} from "../state/constants.ts";
-import {handlePugRendering} from "../logic/views.ts";
+import {api, ENDPOINTS_PROJECT_PATH, handlePugRendering, pages} from "../logic/views.ts";
 import type {ApiConfig} from "../types/apiConfig.ts";
 import {addRoute, determineRouteName, routes} from "../logic/routes.ts";
 
 export async function init() {
-  const api = new Glob(ENDPOINTS_PROJECT_PATH + "**/*.yaml"); // Support nested folders with "**/*.yaml"
-  await createDatabase(api);
-  return await createRoutes(api);
+  await createDatabase();
+  return await createRoutes();
 }
 
 
 // --- Tree-structure-based entities generation ---
 
-async function createDatabase(api: Glob) {
+async function createDatabase() {
   for (const file of api.scanSync(".")) {
     const fileContent = Bun.file(file);
     const config = load(await fileContent.text());
@@ -24,9 +21,7 @@ async function createDatabase(api: Glob) {
   }
 }
 
-async function createRoutes(api: Glob) {
-  const pages = new Glob(ENDPOINTS_PROJECT_PATH + "*.pug");
-
+async function createRoutes() {
   // Browse views and configure "GET" routes dynamically
   for (const file of pages.scanSync(".")) {
     addRoute(determineRouteName(file), "GET", handlePugRendering(file));

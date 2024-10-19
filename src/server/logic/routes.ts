@@ -1,4 +1,4 @@
-import {ENDPOINTS_PROJECT_PATH} from "../state/constants.ts";
+import {ENDPOINTS_PROJECT_PATH} from "./views.ts";
 
 export const routes: Record<string, Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response>> = {};
 
