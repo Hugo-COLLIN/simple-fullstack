@@ -6,7 +6,7 @@ import type {ApiConfig} from "./models/apiConfig.ts";
 import {matchRoute} from "./router.ts";
 
 const API_CONFIG_PATH = "./src/views/endpoints/api/";
-export const PAGES_PROJECT_PATH = "./src/views/endpoints/pages/";
+export const PAGES_PROJECT_PATH = "./src/views/endpoints/";
 
 async function main() {
   // Initialize the database from YAML configuration
