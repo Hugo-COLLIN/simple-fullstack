@@ -8,7 +8,7 @@ export function determineRoute(file: string): string {
   let route = file
     .replace(/\\/g, "/") // Replace folder separators for Windows paths
     .replace(ENDPOINTS_PROJECT_PATH, "")
-    .replace(".pug", "");
+    .replace(/\.(pug|yaml|yml)/, "");
 
   // If the file is "index.pug", associate to root or subfolder
   if (route.endsWith("index")) {
@@ -18,19 +18,6 @@ export function determineRoute(file: string): string {
   }
 
   return route;
-}
-
-/**
- * Determine the API route based on the file path, preserving the folder structure
- * @param file The YAML file path
- */
-export function determineApiRoute(file: string): string {
-  let route = file
-    .replace(/\\/g, "/") // Replace folder separators for Windows paths
-    .replace(ENDPOINTS_PROJECT_PATH, "") // Remove the API base path
-    .replace(".yaml", ""); // Remove file extension
-
-  return `/${route}`;
 }
 
 /**

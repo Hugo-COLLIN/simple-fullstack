@@ -1,7 +1,7 @@
 import {Glob} from "bun";
 import {load} from "js-yaml";
 import {handleEntityRequest, initDatabaseFromConfig} from "../logic/database.ts";
-import {determineApiRoute, determineRoute} from "../logic/routes.ts";
+import {determineRoute} from "../logic/routes.ts";
 import {handlePugRendering} from "../logic/views.ts";
 import type {ApiConfig} from "../types/apiConfig.ts";
 
@@ -39,8 +39,8 @@ async function createRoutes(api: Glob) {
     const config = load(await fileContent.text()) as ApiConfig;
     console.log("Loaded YAML file:", file, "with content:", config);
 
-    // Use determineApiRoute to get a clean path
-    const baseRoute = determineApiRoute(file);
+    // Use determineRoute to get a clean path
+    const baseRoute = determineRoute(file);
     const entity = config.model.table;
     console.log("Entity found:", entity);
 
