@@ -1,9 +1,9 @@
 import {Glob, serve} from "bun";
 import {load} from "js-yaml";
-import {initDatabaseFromConfig, handleEntityRequest, determineApiRoute} from "./requests/database.ts";
-import {determineRoute, handlePugRendering} from "./requests/pages.ts";
+import {initDatabaseFromConfig, handleEntityRequest} from "./requests/database.ts";
+import {handlePugRendering} from "./requests/pages.ts";
 import type {ApiConfig} from "./models/apiConfig.ts";
-import {matchRoute} from "./router.ts";
+import {determineApiRoute, determineRoute, matchRoute} from "./router.ts";
 
 export const ENDPOINTS_PROJECT_PATH = "./src/views/endpoints/";
 

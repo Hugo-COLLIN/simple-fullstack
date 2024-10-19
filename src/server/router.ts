@@ -1,3 +1,5 @@
+import {ENDPOINTS_PROJECT_PATH} from "./server.ts";
+
 /**
  * Match the URL path with the defined routes, including dynamic segments and HTTP methods.
  * @param method The HTTP method (GET, POST, etc.)
@@ -27,4 +29,37 @@ export function matchRoute(
   }
 
   return null; // No match found
+}
+
+/**
+ * Determine the route based on the file path
+ * @param file The Pug file path
+ */
+export function determineRoute(file: string): string {
+  let route = file
+    .replace(/\\/g, "/") // Replace folder separators for Windows paths
+    .replace(ENDPOINTS_PROJECT_PATH, "")
+    .replace(".pug", "");
+
+  // If the file is "index.pug", associate to root or subfolder
+  if (route.endsWith("index")) {
+    route = route.replace("index", "") || "/"; // Manage where file is in a subfolder or at the root
+  } else {
+    route = `/${route}`;
+  }
+
+  return route;
+}
+
+/**
+ * Determine the API route based on the file path, preserving the folder structure
+ * @param file The YAML file path
+ */
+export function determineApiRoute(file: string): string {
+  let route = file
+    .replace(/\\/g, "/") // Replace folder separators for Windows paths
+    .replace(ENDPOINTS_PROJECT_PATH, "") // Remove the API base path
+    .replace(".yaml", ""); // Remove file extension
+
+  return `/${route}`;
 }

@@ -1,5 +1,4 @@
 import {renderFile} from "pug";
-import {ENDPOINTS_PROJECT_PATH} from "../server.ts";
 
 /**
  * Render pug files with optional data
@@ -13,22 +12,3 @@ export function handlePugRendering(file: string, data: Record<string, any> = {})
   };
 }
 
-/**
- * Determine the route based on the file path
- * @param file The Pug file path
- */
-export function determineRoute(file: string): string {
-  let route = file
-    .replace(/\\/g, "/") // Replace folder separators for Windows paths
-    .replace(ENDPOINTS_PROJECT_PATH, "")
-    .replace(".pug", "");
-
-  // If the file is "index.pug", associate to root or subfolder
-  if (route.endsWith("index")) {
-    route = route.replace("index", "") || "/"; // Manage where file is in a subfolder or at the root
-  } else {
-    route = `/${route}`;
-  }
-
-  return route;
-}
