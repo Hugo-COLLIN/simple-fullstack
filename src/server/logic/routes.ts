@@ -1,10 +1,17 @@
 import {ENDPOINTS_PROJECT_PATH} from "../state/constants.ts";
 
+export const routes: Record<string, Record<string, (req: Request, params?: Record<string, string>) => Promise<Response> | Response>> = {};
+
+export function addRoute(path: string, method: string, handler: (req: Request, params?: Record<string, string>) => Promise<Response> | Response) {
+  routes[path] = routes[path] || {};
+  routes[path][method] = handler;
+}
+
 /**
  * Determine the route based on the file path
  * @param file The Pug file path
  */
-export function determineRoute(file: string): string {
+export function determineRouteName(file: string): string {
   let route = file
     .replace(/\\/g, "/") // Replace folder separators for Windows paths
     .replace(ENDPOINTS_PROJECT_PATH, "")
