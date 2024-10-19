@@ -1,5 +1,5 @@
 import {renderFile} from "pug";
-import {PAGES_PROJECT_PATH} from "../server.ts";
+import {ENDPOINTS_PROJECT_PATH} from "../server.ts";
 
 /**
  * Render pug files with optional data
@@ -20,7 +20,7 @@ export function handlePugRendering(file: string, data: Record<string, any> = {})
 export function determineRoute(file: string): string {
   let route = file
     .replace(/\\/g, "/") // Replace folder separators for Windows paths
-    .replace(PAGES_PROJECT_PATH, "")
+    .replace(ENDPOINTS_PROJECT_PATH, "")
     .replace(".pug", "");
 
   // If the file is "index.pug", associate to root or subfolder
