@@ -1,4 +1,4 @@
-import {matchRoute} from "../router.ts";
+import {matchRoute} from "../logic/routes.ts";
 
 export function serve(routes: Record<string, Record<string, (req: Request, params?: Record<string, string>) => (Promise<Response> | Response)>>) {
   const server = Bun.serve({

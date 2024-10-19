@@ -1,9 +1,9 @@
 import {Glob} from "bun";
 import {load} from "js-yaml";
-import {handleEntityRequest, initDatabaseFromConfig} from "../requests/database.ts";
-import {determineApiRoute, determineRoute} from "../router.ts";
-import {handlePugRendering} from "../requests/pages.ts";
-import type {ApiConfig} from "../models/apiConfig.ts";
+import {handleEntityRequest, initDatabaseFromConfig} from "../logic/database.ts";
+import {determineApiRoute, determineRoute} from "../logic/routes.ts";
+import {handlePugRendering} from "../logic/views.ts";
+import type {ApiConfig} from "../types/apiConfig.ts";
 import {ENDPOINTS_PROJECT_PATH} from "../server.ts";
 
 export async function init() {
