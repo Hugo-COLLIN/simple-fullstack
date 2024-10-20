@@ -1,6 +1,6 @@
 import {load} from "js-yaml";
 import {handleEntityRequest, initDatabaseFromConfig} from "../logic/database.ts";
-import {api, ENDPOINTS_PROJECT_PATH, handlePugRendering, pages} from "../logic/views.ts";
+import {api, handlePugRendering, pages} from "../logic/views.ts";
 import type {ApiConfig} from "../types/apiConfig.ts";
 import {addRoute, determineRouteName, routes} from "../logic/routes.ts";
 
@@ -42,17 +42,6 @@ async function createRoutes() {
     if (config.routes.update) addRoute(`${baseRoute}/:id`, "PUT", entityHandler("update"));
     if (config.routes.delete) addRoute(`${baseRoute}/:id`, "DELETE", entityHandler("delete"));
   }
-
-  routes["/"]["GET"] = async function () {
-    const response = await handleEntityRequest(null, "readAll", "todos");
-
-    if (response.ok) {
-      const todos = await response.json();
-      return handlePugRendering(ENDPOINTS_PROJECT_PATH + "index.pug", {todos})();
-    } else {
-      return new Response("Failed to load todos", {status: 500});
-    }
-  };
 
   console.info(routes);
 

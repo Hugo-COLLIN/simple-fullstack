@@ -18,6 +18,17 @@ export function initDatabaseFromConfig(config: any) {
   db.run(`CREATE TABLE IF NOT EXISTS ${table} (${fields});`);
 }
 
+export async function fetchData(dataKeys: string[]): Promise<Record<string, any>> {
+  const data: Record<string, any> = {};
+  for (const key of dataKeys) {
+    const response = await handleEntityRequest(null, "readAll", key);
+    if (response.ok) {
+      data[key] = await response.json();
+    }
+  }
+  return data;
+}
+
 /**
  * Handle a dynamic entity request (create, read, update, delete)
  */
@@ -71,4 +82,3 @@ export async function handleEntityRequest(req: Request | null, action: string, e
 
   return new Response("Bad Request", { status: 400 });
 }
-
